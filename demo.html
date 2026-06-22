@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FairyGlass · 液态玻璃设计系统</title>
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/glass.css" />
+<style>
+  /* —— 仅 demo 页用的布局，不属于设计系统 —— */
+  .wrap { max-width: 980px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 40px) 80px; }
+  .demo-head { text-align: center; margin: 24px 0 8px; }
+  .demo-head .sub { color: var(--fg-muted); font-size: 0.95rem; margin-top: 8px; }
+  .demo-head .ver { color: var(--fg-dim); font-size: 0.78rem; margin-top: 6px; letter-spacing: 0.08em; }
+  section { margin-top: 40px; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .pad { padding: 18px 20px; }
+  .ctrl { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-bottom: 12px; }
+  .ctrl .info { flex: 1; }
+  .ctrl .info .t { font-weight: 600; font-size: 0.95rem; }
+  .ctrl .info .d { color: var(--fg-dim); font-size: 0.8rem; margin-top: 3px; }
+  .swatch { height: 56px; border-radius: var(--radius-sm); border: 1px solid var(--glass-stroke); display: flex; align-items: flex-end; padding: 6px 8px; font-size: 0.7rem; color: var(--fg); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .stepper { display: flex; align-items: center; gap: 8px; }
+  .stepper .fg-btn { width: 32px; height: 32px; padding: 0; font-size: 17px; }
+  .note { color: var(--fg-dim); font-size: 0.8rem; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="demo-head lg-enter">
+    <div class="fg-slogan">FairyGlass</div>
+    <div class="sub">微蓝暗色 · 跨浏览器液态玻璃设计系统</div>
+    <div class="ver">TOKENS · GLASS · REFRACTION ENGINE</div>
+  </div>
+
+  <!-- 折射透镜：浮空主按钮 -->
+  <section>
+    <div class="fg-section-title">折射透镜（浮空元素专用）</div>
+    <div class="row" style="justify-content:center; padding:20px 0;">
+      <button class="fg-cta" data-glass="button">
+        <span class="fg-cta__main">液态玻璃透镜</span>
+        <span style="color:var(--fg-muted);font-size:0.85rem;">data-glass="button" · 边缘真实折射 + 色散</span>
+      </button>
+    </div>
+    <p class="note">上方按钮经 <code>liquidGlass.js</code> 注入折射层：边缘把背后光斑真实弯曲，并带极淡彩虹镶边。只给浮空、数量少的元素用。</p>
+  </section>
+
+  <!-- 色板 -->
+  <section>
+    <div class="fg-section-title">色彩令牌</div>
+    <div class="swatches">
+      <div class="swatch" style="background:var(--bg-0)">bg-0</div>
+      <div class="swatch" style="background:var(--bg-1)">bg-1</div>
+      <div class="swatch" style="background:var(--bg-2)">bg-2</div>
+      <div class="swatch" style="background:var(--accent)">accent</div>
+      <div class="swatch" style="background:var(--accent-bright);color:#06101f">accent-bright</div>
+      <div class="swatch" style="background:var(--accent-soft)">accent-soft</div>
+      <div class="swatch" style="background:rgba(var(--glow-b),.6)">glow-b 青</div>
+      <div class="swatch" style="background:var(--ok-soft);color:var(--ok)">ok</div>
+      <div class="swatch" style="background:var(--danger-soft);color:var(--danger)">danger</div>
+      <div class="swatch" style="background:var(--violet-soft);color:var(--violet)">violet</div>
+    </div>
+  </section>
+
+  <!-- 按钮 -->
+  <section>
+    <div class="fg-section-title">按钮 · fg-btn</div>
+    <div class="row">
+      <button class="fg-btn">默认</button>
+      <button class="fg-btn fg-btn--primary">主操作</button>
+      <button class="fg-btn fg-btn--danger">危险</button>
+      <button class="fg-btn fg-btn--ghost">幽灵</button>
+      <button class="fg-btn fg-btn--tiny">微型</button>
+      <button class="fg-btn" disabled>禁用</button>
+    </div>
+  </section>
+
+  <!-- 药丸 -->
+  <section>
+    <div class="fg-section-title">玻璃药丸 · fg-chip</div>
+    <div class="row">
+      <span class="fg-chip">复制</span>
+      <span class="fg-chip">在浏览器打开</span>
+      <span class="fg-chip is-active">✓ 已选中</span>
+      <span class="fg-chip" data-glass="chip">折射药丸</span>
+    </div>
+  </section>
+
+  <!-- 卡片 -->
+  <section>
+    <div class="fg-section-title">玻璃卡片 · fg-card</div>
+    <div class="grid-cards lg-stagger">
+      <div class="fg-card pad"><div style="font-weight:600">标准卡</div><p class="note">fg-card · 磨砂底 + 高光描边</p></div>
+      <div class="fg-card fg-card--flat pad"><div style="font-weight:600">轻量卡</div><p class="note">fg-card--flat · 无 backdrop，密集列表护性能</p></div>
+      <div class="fg-card fg-card--accent pad"><div style="font-weight:600">强调卡</div><p class="note">fg-card--accent · 左上渗入一缕蓝</p></div>
+    </div>
+  </section>
+
+  <!-- 控制卡 + 开关 + 步进器 -->
+  <section>
+    <div class="fg-section-title">开关与步进器</div>
+    <div class="fg-card fg-card--accent ctrl">
+      <div class="info"><div class="t">总开关</div><div class="d">玻璃轨道 + 高光滑块 + 开启态蓝辉光</div></div>
+      <label class="fg-switch"><input type="checkbox" checked /><span class="fg-slider"></span></label>
+    </div>
+    <div class="fg-card ctrl">
+      <div class="info"><div class="t">保留上限</div><div class="d">fg-num + fg-btn 组成步进器</div></div>
+      <div class="stepper">
+        <button class="fg-btn">−</button>
+        <input class="fg-num" type="number" value="500" />
+        <span style="color:var(--fg-muted);font-size:0.8rem">条</span>
+        <button class="fg-btn">+</button>
+      </div>
+    </div>
+    <div class="fg-card ctrl">
+      <div class="info"><div class="t">搜索框</div><div class="d">fg-input · 聚焦泛蓝</div></div>
+      <input class="fg-input" placeholder="查找…" style="width:240px" />
+    </div>
+  </section>
+
+  <!-- 徽章 -->
+  <section>
+    <div class="fg-section-title">徽章</div>
+    <div class="row">
+      <span class="fg-badge">v0.1</span>
+      <span class="fg-badge--privacy">本地处理 · 零上传</span>
+    </div>
+  </section>
+
+  <!-- 弹窗 / toast 触发 -->
+  <section>
+    <div class="fg-section-title">弹窗与浮层</div>
+    <div class="row">
+      <button class="fg-btn fg-btn--primary" onclick="document.getElementById('demoModal').style.display='flex'">打开弹窗</button>
+      <button class="fg-btn" onclick="showToast('已保存到本机')">触发 toast</button>
+    </div>
+  </section>
+
+  <p class="note" style="margin-top:48px;text-align:center">
+    一份令牌、一份组件、一份折射引擎。接入只需引 tokens.css + glass.css，折射可选。详见 README.md 与 AGENTS.md。
+  </p>
+</div>
+
+<!-- 弹窗 -->
+<div class="fg-modal-mask" id="demoModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="fg-modal" data-glass="card">
+    <div style="font-size:1.05rem;font-weight:700;margin-bottom:10px">删除这条版本？</div>
+    <p class="note" style="margin-bottom:18px">弹窗是浮空元素，用 data-glass="card" 上折射透镜。</p>
+    <div class="row" style="justify-content:flex-end">
+      <button class="fg-btn" onclick="document.getElementById('demoModal').style.display='none'">取消</button>
+      <button class="fg-btn fg-btn--danger" onclick="document.getElementById('demoModal').style.display='none'">删除</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/liquidGlass.js"></script>
+<script>
+  // 给所有 data-glass 元素注入折射（bar/滚动容器会被引擎自动跳过）
+  FairyGlass.hydrateGlass(document);
+
+  function showToast(msg) {
+    const t = document.createElement("div");
+    t.className = "fg-toast";
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2400);
+  }
+</script>
+</body>
+</html>

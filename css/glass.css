@@ -1,0 +1,514 @@
+/* ============================================================
+ *  FairyGlass · glass.css
+ *  组件层：基于 tokens.css 的玻璃材质构建可复用 UI 组件。
+ *  ------------------------------------------------------------
+ *  依赖：必须先引入 tokens.css。
+ *
+ *  组件清单：
+ *   - .glass / .glass--strong   玻璃基类（卡片、面板的底材）
+ *   - .fg-card                  圆角玻璃卡片
+ *   - .fg-bar                   贴边长条（顶/底/侧栏，走磨砂不走折射）
+ *   - .fg-btn (+ --primary/--danger/--ghost/--tiny)  按钮
+ *   - .fg-chip                  玻璃药丸（动作/标签）
+ *   - .fg-cta                   着陆页主按钮（折射透镜）
+ *   - .fg-switch                开关
+ *   - .fg-input / .fg-num       输入框 / 数字步进框
+ *   - .fg-nav-item              侧栏导航项
+ *   - .fg-section-title         分区标题（带渐隐分隔线）
+ *   - .fg-modal-mask / .fg-modal  弹窗
+ *   - .fg-toast                 浮层提示
+ *   - .fg-badge                 徽章（含 --privacy 呼吸点）
+ *
+ *  折射约定（性能与黑边的底线，务必遵守）：
+ *   - 折射透镜（filter:url 折射层）只给【浮空、数量少】的元素：hero 卡、主按钮、
+ *     弹窗、单独强调的胶囊。用 data-glass="card|button|chip" 标记，由
+ *     liquidGlass.js 注入。
+ *   - 贴视口边缘的长条（顶/底/侧栏）→ data-glass="bar" 或直接 .fg-bar：
+ *     只走磨砂。折射层的 fixed 光斑图在视口外是纯深色，贴边会采到 → 黑边。
+ *   - 滚动容器（overflow-y:auto/scroll）→ 跳过折射：折射层会随内容滚走并引发重绘。
+ *   - 大批量密集卡片（几十上百张）→ 走磨砂，不上折射，护性能。
+ * ============================================================ */
+
+/* ============ 折射层（liquidGlass.js 注入的子层样式） ============ */
+/* 跨浏览器液态玻璃核心：折射走 filter:url() 而非 backdrop-filter:url()。
+   做法：给玻璃元素注入 .lg-refract 子层，该层用 background-attachment:fixed
+   画一份与 body::before / --glow-field 视口对齐的光斑拷贝，再施加 SVG 位移图。
+   于是「透过玻璃看到的光斑」与真实背景严丝合缝，仅边缘被弯曲，三系引擎一致。 */
+.lg-refract {
+  position: absolute;
+  inset: 0; /* JS 覆写为 -bleed，向外扩一圈供边缘折射采样 */
+  z-index: -1; /* 沉到玻璃内容之下 */
+  border-radius: inherit;
+  /* 折射层不透明地呈现「背景拷贝 + 乳白 tint」：负 z-index 会绘制在元素自身
+     背景之上，故乳白 tint 必须并入此层（否则元素的 fill 被盖、玻璃发暗）。 */
+  background-color: var(--bg-0);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)),
+    var(--glow-field);
+  background-attachment: fixed; /* 关键：按视口对齐，与真实背景严丝合缝 */
+  background-size: 100vw 100vh;
+  pointer-events: none;
+}
+/* 宿主：建立定位+层叠上下文，并按圆角裁掉折射层外扩的 bleed（消除内圈黑边）。
+   overflow:hidden 不裁 box-shadow，故外投影与 hover 辉光不受影响。 */
+[data-glass],
+.lg-host {
+  isolation: isolate;
+}
+.lg-host {
+  overflow: hidden;
+}
+
+/* ============ 玻璃基类 ============ */
+/* Apple material 精髓：backdrop blur+saturate 让透过的背景更鲜活；极低不透明度
+   冷色填充；顶部 1px 高光描边模拟玻璃边缘折射；外投影给景深、内阴影给厚度。 */
+.glass {
+  position: relative;
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-glass), var(--inset-glass);
+}
+.glass--strong {
+  background: var(--glass-fill-strong);
+  backdrop-filter: var(--glass-backdrop-strong);
+  -webkit-backdrop-filter: var(--glass-backdrop-strong);
+}
+
+/* 玻璃顶部高光：一道极细的渐隐亮线，是 Apple 玻璃的灵魂细节。
+   用 mask 镂空只留 1px 描边。任何想要玻璃质感的容器都可叠加 .fg-highlight。 */
+.fg-highlight::before,
+.fg-card::before,
+.fg-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, var(--glass-highlight), transparent 28%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* ============ 玻璃卡片 ============ */
+.fg-card {
+  position: relative;
+  background: var(--glass-fill);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-glass), var(--inset-glass);
+}
+/* 轻量卡：只填充+高光，不做 backdrop 模糊，用于大批量密集卡片护性能。 */
+.fg-card--flat {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--inset-glass);
+}
+/* 强调卡：左上角渗入一缕蓝，用于「总开关」这类主控卡。 */
+.fg-card--accent {
+  background: linear-gradient(120deg, rgba(77, 159, 255, 0.14), var(--glass-fill));
+  border-color: rgba(var(--glow-a), 0.35);
+}
+
+/* ============ 贴边长条（顶/底/侧栏） ============ */
+/* 走磨砂不走折射，避免贴视口边缘采到视口外纯深色 → 黑边。 */
+.fg-bar {
+  background: var(--glass-fill-strong);
+  backdrop-filter: blur(18px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(18px) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-glass), var(--inset-glass);
+}
+
+/* ============ 按钮 ============ */
+.fg-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.5em 1.1em;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-stroke);
+  background: var(--glass-fill-strong);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    transform var(--dur-quick) var(--ease-out-back),
+    border-color var(--dur-quick) var(--ease-out-quint),
+    background var(--dur-quick) var(--ease-out-quint),
+    box-shadow var(--dur-quick) var(--ease-out-quint),
+    color var(--dur-quick) var(--ease-out-quint);
+}
+.fg-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: rgba(var(--glow-a), 0.55);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 22px rgba(var(--glow-a), 0.2);
+}
+.fg-btn:active {
+  transform: translateY(0) scale(0.95);
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-snap);
+}
+.fg-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+.fg-btn--primary {
+  border-color: rgba(var(--glow-a), 0.5);
+  background: linear-gradient(180deg, rgba(var(--glow-a), 0.32), rgba(var(--glow-c), 0.32));
+  color: var(--accent-bright);
+}
+.fg-btn--danger:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: var(--danger-soft);
+  color: var(--danger);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 22px rgba(239, 68, 68, 0.18);
+}
+.fg-btn--ghost {
+  background: transparent;
+}
+.fg-btn--tiny {
+  padding: 0.3em 0.8em;
+  font-size: 0.72rem;
+}
+
+/* ============ 玻璃药丸（动作/标签） ============ */
+.fg-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.65em 1.2em;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-stroke);
+  background: var(--glass-fill-strong);
+  backdrop-filter: blur(20px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(20px) saturate(var(--glass-saturate));
+  box-shadow: var(--inset-glass), 0 2px 10px rgba(0, 0, 0, 0.25);
+  color: var(--fg);
+  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--dur-quick) var(--ease-out-back),
+    border-color var(--dur-quick) var(--ease-out-quint),
+    background var(--dur-quick) var(--ease-out-quint),
+    box-shadow var(--dur-quick) var(--ease-out-quint);
+}
+.fg-chip:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: rgba(var(--glow-a), 0.55);
+  background: var(--accent-soft);
+  box-shadow:
+    var(--inset-glass),
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(var(--glow-a), 0.2);
+}
+.fg-chip:active {
+  transform: translateY(0) scale(0.95);
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-snap);
+}
+.fg-chip.is-active {
+  border-color: var(--accent);
+  color: var(--accent-bright);
+  background: var(--accent-soft);
+}
+
+/* ============ 着陆页主按钮（折射透镜，配 data-glass="button"） ============ */
+.fg-cta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-width: 300px;
+  padding: 2.2rem 3.2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-stroke);
+  background: var(--glass-fill-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-glass), var(--inset-glass);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-out-quint),
+    box-shadow var(--dur-base) var(--ease-out-quint),
+    border-color var(--dur-base) var(--ease-out-quint);
+}
+.fg-cta:hover {
+  transform: translateY(-3px) scale(1.012);
+  border-color: rgba(var(--glow-a), 0.5);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(var(--glow-a), 0.22),
+    var(--inset-glass);
+}
+.fg-cta:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: var(--dur-quick);
+}
+.fg-cta__main {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fff, var(--accent-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ============ 开关 ============ */
+/* 玻璃轨道 + 高光滑块 + 开启态蓝色辉光。 */
+.fg-switch {
+  position: relative;
+  width: 48px;
+  height: 27px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.fg-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.fg-switch .fg-slider {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: var(--dur-base) var(--ease-out-quint);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--glass-stroke);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.fg-switch .fg-slider::before {
+  content: "";
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  transition: var(--dur-base) var(--ease-out-quint);
+  background: linear-gradient(180deg, #ffffff, #d6e2f5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.fg-switch input:checked + .fg-slider {
+  background: linear-gradient(180deg, rgba(var(--glow-a), 0.85), rgba(var(--glow-c), 0.9));
+  border-color: rgba(var(--glow-a), 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 14px rgba(var(--glow-a), 0.5);
+}
+.fg-switch input:checked + .fg-slider::before {
+  transform: translateX(21px);
+  background: linear-gradient(180deg, #ffffff, #eaf2ff);
+}
+
+/* ============ 输入框 / 数字步进框 ============ */
+.fg-input {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 0.85rem;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-pill);
+  outline: none;
+  transition: var(--dur-quick) var(--ease-out-quint);
+}
+.fg-input:focus {
+  border-color: rgba(var(--glow-a), 0.6);
+  background: rgba(var(--glow-a), 0.08);
+}
+.fg-input::placeholder {
+  color: var(--fg-dim);
+}
+.fg-num {
+  width: 60px;
+  height: 32px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: var(--dur-quick) var(--ease-out-quint);
+}
+.fg-num:focus {
+  border-color: rgba(var(--glow-a), 0.6);
+  background: rgba(var(--glow-a), 0.1);
+}
+/* 去掉 number 输入框的上下箭头，用自定义加减按钮 */
+.fg-num::-webkit-inner-spin-button,
+.fg-num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ============ 侧栏导航项 ============ */
+.fg-nav-item {
+  margin: 2px 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  transition: var(--dur-quick) var(--ease-out-quint);
+}
+.fg-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fg);
+}
+.fg-nav-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  box-shadow: inset 0 0 0 1px rgba(var(--glow-a), 0.3);
+}
+
+/* ============ 分区标题（带渐隐分隔线） ============ */
+.fg-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-bright);
+  margin: 22px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.06em;
+}
+.fg-section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--glass-stroke), transparent);
+}
+
+/* ============ 标语：衬线加粗，蓝白渐变 ============ */
+.fg-slogan {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 2rem;
+  text-align: center;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #fff, var(--accent-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ============ 弹窗 ============ */
+.fg-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+}
+.fg-modal {
+  position: relative;
+  width: 440px;
+  max-width: 90%;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--glass-fill-strong);
+  backdrop-filter: var(--glass-backdrop-strong);
+  -webkit-backdrop-filter: var(--glass-backdrop-strong);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-glass), var(--inset-glass);
+}
+
+/* ============ 浮层提示 toast ============ */
+.fg-toast {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-fill-strong);
+  backdrop-filter: blur(10px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(10px) saturate(var(--glass-saturate));
+  color: var(--fg);
+  padding: 11px 22px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  z-index: 200;
+  border: 1px solid var(--glass-stroke);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ============ 徽章 ============ */
+.fg-badge {
+  font-size: 0.78rem;
+  padding: 0.35em 0.85em;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-stroke);
+  color: var(--fg-muted);
+}
+/* 隐私/状态徽章：玻璃胶囊 + 左侧呼吸绿点示意「正在保护」。 */
+.fg-badge--privacy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.4em 0.95em 0.4em 0.85em;
+  color: var(--accent-bright);
+  border-color: rgba(var(--glow-a), 0.32);
+  background: var(--accent-soft);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 12px rgba(var(--glow-a), 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.25);
+  font-weight: 600;
+  overflow: hidden;
+}
+.fg-badge--privacy::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: #34d39a;
+  box-shadow: 0 0 8px rgba(52, 211, 154, 0.9), 0 0 2px rgba(52, 211, 154, 1);
+  animation: fg-pulse 2.4s ease-in-out infinite;
+}
+@keyframes fg-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fg-badge--privacy::after {
+    animation: none;
+    opacity: 0.9;
+  }
+}
