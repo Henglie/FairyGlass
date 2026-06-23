@@ -45,7 +45,8 @@ FairyGlass 是一套**微蓝暗色液态玻璃设计系统**，不是某个应�
 1. **微蓝暗色**。底色 `--bg-0/1/2` 是带蓝的深夜色，**绝不用纯黑**。
 2. **绝不用紫**。强调色是天蓝 `--accent`；光斑 `--glow-a/b/c` 是蓝/青/深蓝。`--violet` 仅作「需与蓝区分的次要语义标签」（如插件标记），不得用作主色调。
 3. **玻璃中性无色**。玻璃填充是白色极低不透明度（`--glass-fill`），**不给玻璃本体染蓝**。蓝只来自背后 `--glow-field` 光斑被采样/折射。
-4. **动效不回弹**。高初速 → 迅速滑停。用 `--ease-out-quint`/`--ease-out-back`/`--ease-snap`，**禁止过冲/弹簧回弹**。只动 `transform`/`opacity`（GPU 合成）。
+4. **动效不回弹**（默认）。高初速 → 迅速滑停。用 `--ease-out-quint`/`--ease-out-back`/`--ease-snap`，**禁止过冲/弹簧回弹**。只动 `transform`/`opacity`（GPU 合成）。
+   - **受控例外**：`--ease-spring-back`（`cubic-bezier(.34,1.56,.64,1)`，y>1 段过冲）仅给**主动要求弹性**的微交互用，如 `.fg-search` 聚焦展宽。**不得污染主操作**（按钮/卡片/抽屉/入场），否则整体手感变松。
 5. **不用彩色 emoji**。保留 `● ✓ ← ▼ ×` 等黑白几何符号（作者明确反感 emoji）。
 6. **衬线给标题/标语，无衬线给界面**。`--font-mono` 里 CJK sans 必须排在 `monospace` **之前**，否则 Windows 把 CJK 兜底成宋体衬线（已知 bug）。
 
@@ -56,7 +57,7 @@ FairyGlass 是一套**微蓝暗色液态玻璃设计系统**，不是某个应�
 ```
 FairyGlass/
   css/tokens.css      令牌层：颜色/字体/玻璃材质/动效/背景/滚动条/入场动画
-  css/glass.css       组件层：卡/按钮/药丸/开关/输入/导航/弹窗/toast/徽章（类名前缀统一 fg-）
+  css/glass.css       组件层：基础件 + 完整 VIS（外壳/导航/折叠/表单/反馈/数据展示，前缀统一 fg-）
   js/liquidGlass.js   折射引擎（可选，UMD，挂 window.FairyGlass）
   demo.html           全组件预览 + 折射实例（改动必须在这里补预览实例）
   README.md           人看的介绍 + 接入方式
@@ -100,12 +101,32 @@ FairyGlass/
 - [x] 跨浏览器折射统一（Chromium + Firefox + 国产内核像素级一致，`filter:url()` 方案）。
 - [x] `demo.html` 全组件预览 + 折射实例。
 - [x] 从剪贴板项目 + FairySave 抽取统一为独立设计系统。
+- [x] git 仓库已建。
+- [x] **`.fg-search` 弹性搜索框**：聚焦时宽度【弹一下】展开（`--ease-spring-back` 受控回弹），描边泛蓝 + 一圈淡蓝辉光。颜色/辉光仍走 quint 顺滑，避免颜色跟着抖。两个 CSS 变量 `--fg-search-width` / `--fg-search-width-focus` 控制收/展宽度，外部覆写即可。
+- [x] **`.fg-drawer` / `.fg-drawer__inner` 抽屉**：`grid-template-rows: 0fr → 1fr` 高度过渡。选这条而不是 max-height 是因为后者必须写「假上限」，内容低则留白长、内容高又被截。0fr→1fr 让网格行的【自然高度】参与过渡，无视觉延迟。内层负责 `overflow:hidden` + `min-height:0`（让网格行真能压到 0）。
+- [x] **`--ease-spring-back` 令牌**：`cubic-bezier(.34, 1.56, .64, 1)`，y>1 段过冲一下再回落。这是「不回弹」红线的【受控例外】，仅给主动要求弹性的微交互用（搜索框聚焦展宽），**不污染主操作**（按钮/卡片/抽屉/入场）。红线已在第 4 条更新。
+- [x] **`.fg-card--accent` 降饱和**：从 0.14 / 0.35 降到 0.05 / 0.2。原值玻璃片偏鲜艳显廉价，新值是 FairySave 实战调出的克制档。下游若已用 0.14 老值，覆写无所谓；新接入直接用即可。
+- [x] **demo 补 preset 参数表**：折射区下一张表列出 button/card/chip/bar 的 bezel/scale/blur/dispersion 档位（数值即 `liquidGlass.js:288-293` 硬编码），调用方挑参用。挑不准用 `card` 默认，要更猛传 opts 覆写。
+- [x] **demo 补 `.fg-bar` 贴边长条预览**：药丸区后加一段磨砂长条实例，写明「不上折射、防黑边」的核心约定（之前 demo 通篇缺这个组件实例）。
+- [x] **VIS 补全（v0.2）**：在基础组件之外补齐真实应用必用的「第二梯队」组件，glass.css 从 ~580 行扩到 ~1340 行。新增：应用外壳（`.fg-app` / `.fg-sidebar` / `.fg-topbar` / `.fg-main` / `.fg-main__scroll`，**浮块式**——侧栏/顶栏/内容区各自独立圆角玻璃，块间 gap、四周 padding，对齐 FairySave `#app` 形态，不做贴边方角）、折叠手风琴 `.fg-accordion`（剪贴板 `.cat-section` / 快存 drawer-head 的统一沉淀，grid 0fr→1fr）、标签页 `.fg-tabs`、分段控件 `.fg-segmented`、下拉 `.fg-select` + 浮层菜单 `.fg-menu`、文本域 `.fg-textarea`、复选/单选 `.fg-check` / `.fg-radio`（玻璃自绘）、标签 `.fg-tag`（5 语义色 + violet 次要）、tooltip、进度条 `.fg-progress`（含 indeterminate）、spinner、骨架屏、头像、提示横幅 `.fg-alert`、数据表格 `.fg-table`、列表 `.fg-list`、面包屑、分页、空状态、分隔线、键帽 `.fg-kbd`、步进器 `.fg-stepper`（正式组件化）。demo 重构为五面板侧栏导航全展示。
+- [x] **修 `.fg-badge--privacy` 方角 bug**：早期版本圆角只写在 `.fg-badge` 上，privacy 徽章单用时拿不到 `border-radius` → 方角。已补 `border-radius:var(--radius-pill)` + border + font-size，独立可用。
+- [x] **修 `.fg-num` 残留原生 spinner**：此前只去了 webkit 上下箭头，Firefox 原生 spinner 仍露在数字旁显「原始 UI」。已补 `appearance:textfield` 跨浏览器去除。
+- [x] **「玻璃太艳」定位 + 解法**：FairyGlass 材质与剪贴板 `base.css` 逐字节相同（剪贴板是认可母本），艳不来自材质而来自**上下文**——980px 裸列把卡片压在视口中心最强叠加光斑上，`saturate(180%)` 顶起透光的蓝。解法不动材质（动则背离母本），而是套应用外壳让内容落回被前层玻璃过滤的弱光区。**材质红线不变**。
 
 ## ▍待办
+- [ ] **回灌检查**：剪贴板项目的 `.cat-body`（grid 0fr→1fr 抽屉）已经是 `.fg-drawer` 的事实原型，但下游仍用 `.cat-body` 类名。下次接手剪贴板时可考虑把 `.cat-body` 重命名为 `.fg-drawer` 类（或并行支持），统一命名空间。**不强制改**，下游稳定运行的别动。
+- [ ] **下游同步检查**：FairySave `ui/index.html` 的 `<style>` 是 FairyGlass 令牌的【内联复刻】（webview file:// 约束下没法 link 外部 CSS，复刻是预期）。若改 FairyGlass 的令牌/红线，记得一并改 FairySave 的 inline 副本，否则会漂移。
+  - 当前漂移项（已对齐，仅记录）：FairySave 已加 `--ease-spring-back` 令牌、`.search` 已是弹性版（`--ease-spring-back`，宽度 240→300）、`.ctrl-card.master` 已降饱和（0.05/0.2）。这些在 FairyGlass 也已落定，两边一致。
+- [ ] **demo 跨浏览器验证**：`.fg-search`（聚焦弹性展宽）/ `.fg-drawer`（0fr→1fr 抽屉）/ 本轮新增的 `.fg-bar` 长条与 preset 参数表，AI 没法验证视觉。下次有人值守时打开 `demo.html`，Chromium + Firefox 各一遍：核验回弹/抽屉顺滑无截断、`.fg-bar` 磨砂无黑边、折射两边都出现。
 
-- [ ] 建 git 仓库（目前四项目中唯一没有 .git 的）。
-- [ ] 沉淀 `data-glass` preset 的参数表到 demo（button/card/chip/bar 的 bezel/scale 数值）。
-- [ ] 把下游已打磨但未回灌的样式（若有）合并回 tokens/glass。
+---
+
+## ▍接手快捷入口（给下一个 AI）
+
+- 想看本系统设计基调与红线 → 上面「技术栈红线」+「踩坑记录」两节，**先读再动手**。
+- 想知道弹性微交互边界 → 红线第 4 条，受控例外只给 `--ease-spring-back`，仅微交互可用。
+- 想看新组件怎么用 → `demo.html` 末尾「弹性搜索框」「抽屉」两节有可交互预览。
+- 改完动效/颜色 → 下游 FairySave `ui/index.html` 内联 CSS 段需手动同步（webview 复刻约束）。
 
 ---
 

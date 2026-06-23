@@ -7,13 +7,11 @@
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/glass.css" />
 <style>
-  /* —— 仅 demo 页用的布局，不属于设计系统 —— */
-  .wrap { max-width: 980px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 40px) 80px; }
-  .demo-head { text-align: center; margin: 24px 0 8px; }
-  .demo-head .sub { color: var(--fg-muted); font-size: 0.95rem; margin-top: 8px; }
-  .demo-head .ver { color: var(--fg-dim); font-size: 0.78rem; margin-top: 6px; letter-spacing: 0.08em; }
-  section { margin-top: 40px; }
+  /* —— 仅 demo 页用的零碎布局，不属于设计系统 —— */
+  .demo-section { margin-top: 38px; }
+  .demo-section:first-child { margin-top: 8px; }
   .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: 12px; }
   .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
   .pad { padding: 18px 20px; }
   .ctrl { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-bottom: 12px; }
@@ -22,126 +20,427 @@
   .ctrl .info .d { color: var(--fg-dim); font-size: 0.8rem; margin-top: 3px; }
   .swatch { height: 56px; border-radius: var(--radius-sm); border: 1px solid var(--glass-stroke); display: flex; align-items: flex-end; padding: 6px 8px; font-size: 0.7rem; color: var(--fg); }
   .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-  .stepper { display: flex; align-items: center; gap: 8px; }
-  .stepper .fg-btn { width: 32px; height: 32px; padding: 0; font-size: 17px; }
   .note { color: var(--fg-dim); font-size: 0.8rem; line-height: 1.7; }
+  .demo-hero { text-align: center; padding: 14px 0 6px; }
+  .demo-hero .sub { color: var(--fg-muted); font-size: 0.95rem; margin-top: 8px; }
+  .demo-hero .ver { color: var(--fg-dim); font-size: 0.78rem; margin-top: 6px; letter-spacing: 0.08em; }
+  /* preset 参数表（仅 demo 用） */
+  .preset-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .preset-table th, .preset-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--glass-stroke); white-space: nowrap; }
+  .preset-table thead th { color: var(--accent-bright); font-weight: 600; }
+  .preset-table thead th span { display: block; font-weight: 400; color: var(--fg-dim); font-size: 0.7rem; }
+  .preset-table tbody tr:last-child td { border-bottom: none; }
+  .preset-table code { color: var(--accent-bright); }
+  .preset-table .def { margin-left: 6px; font-size: 0.66rem; color: var(--fg-dim); border: 1px solid var(--glass-stroke); border-radius: 999px; padding: 1px 7px; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="demo-head lg-enter">
-    <div class="fg-slogan">FairyGlass</div>
-    <div class="sub">微蓝暗色 · 跨浏览器液态玻璃设计系统</div>
-    <div class="ver">TOKENS · GLASS · REFRACTION ENGINE</div>
-  </div>
+<!-- 应用外壳：侧栏 + 顶栏 + 主区。这层外壳让主区卡片落在被前层玻璃过滤过的
+     弱光区（不再 980px 裸列压在视口中心强光上），观感与 FairySave / 剪贴板一致。 -->
+<div class="fg-app">
 
-  <!-- 折射透镜：浮空主按钮 -->
-  <section>
-    <div class="fg-section-title">折射透镜（浮空元素专用）</div>
-    <div class="row" style="justify-content:center; padding:20px 0;">
-      <button class="fg-cta" data-glass="button">
-        <span class="fg-cta__main">液态玻璃透镜</span>
-        <span style="color:var(--fg-muted);font-size:0.85rem;">data-glass="button" · 边缘真实折射 + 色散</span>
-      </button>
+  <!-- 侧栏：独立圆角玻璃浮块（磨砂，不上折射） -->
+  <aside class="fg-sidebar">
+    <div class="fg-sidebar__brand">
+      <span class="fg-slogan" style="font-size:1.3rem">FairyGlass</span>
     </div>
-    <p class="note">上方按钮经 <code>liquidGlass.js</code> 注入折射层：边缘把背后光斑真实弯曲，并带极淡彩虹镶边。只给浮空、数量少的元素用。</p>
-  </section>
-
-  <!-- 色板 -->
-  <section>
-    <div class="fg-section-title">色彩令牌</div>
-    <div class="swatches">
-      <div class="swatch" style="background:var(--bg-0)">bg-0</div>
-      <div class="swatch" style="background:var(--bg-1)">bg-1</div>
-      <div class="swatch" style="background:var(--bg-2)">bg-2</div>
-      <div class="swatch" style="background:var(--accent)">accent</div>
-      <div class="swatch" style="background:var(--accent-bright);color:#06101f">accent-bright</div>
-      <div class="swatch" style="background:var(--accent-soft)">accent-soft</div>
-      <div class="swatch" style="background:rgba(var(--glow-b),.6)">glow-b 青</div>
-      <div class="swatch" style="background:var(--ok-soft);color:var(--ok)">ok</div>
-      <div class="swatch" style="background:var(--danger-soft);color:var(--danger)">danger</div>
-      <div class="swatch" style="background:var(--violet-soft);color:var(--violet)">violet</div>
+    <nav class="fg-sidebar__nav" id="demoNav">
+      <div class="fg-nav-item is-active" data-view="overview">● 概览</div>
+      <div class="fg-nav-item" data-view="forms">● 表单控件</div>
+      <div class="fg-nav-item" data-view="feedback">● 反馈与状态</div>
+      <div class="fg-nav-item" data-view="data">● 数据展示</div>
+      <div class="fg-nav-item" data-view="refraction">● 折射透镜</div>
+    </nav>
+    <div class="fg-sidebar__foot">
+      v0.2 · 微蓝暗色液态玻璃<br>TOKENS · GLASS · REFRACTION
     </div>
-  </section>
+  </aside>
 
-  <!-- 按钮 -->
-  <section>
-    <div class="fg-section-title">按钮 · fg-btn</div>
-    <div class="row">
-      <button class="fg-btn">默认</button>
-      <button class="fg-btn fg-btn--primary">主操作</button>
-      <button class="fg-btn fg-btn--danger">危险</button>
-      <button class="fg-btn fg-btn--ghost">幽灵</button>
-      <button class="fg-btn fg-btn--tiny">微型</button>
-      <button class="fg-btn" disabled>禁用</button>
-    </div>
-  </section>
+  <!-- 主区：顶栏 + 滚动内容 -->
+  <div class="fg-main">
+    <header class="fg-topbar">
+      <span class="fg-topbar__title" id="demoTitle">概览</span>
+      <span class="fg-topbar__spacer"></span>
+      <input class="fg-search" placeholder="搜索组件…" />
+      <span class="fg-badge--privacy fg-badge">本地处理 · 零上传</span>
+    </header>
 
-  <!-- 药丸 -->
-  <section>
-    <div class="fg-section-title">玻璃药丸 · fg-chip</div>
-    <div class="row">
-      <span class="fg-chip">复制</span>
-      <span class="fg-chip">在浏览器打开</span>
-      <span class="fg-chip is-active">✓ 已选中</span>
-      <span class="fg-chip" data-glass="chip">折射药丸</span>
-    </div>
-  </section>
+    <div class="fg-main__scroll">
 
-  <!-- 卡片 -->
-  <section>
-    <div class="fg-section-title">玻璃卡片 · fg-card</div>
-    <div class="grid-cards lg-stagger">
-      <div class="fg-card pad"><div style="font-weight:600">标准卡</div><p class="note">fg-card · 磨砂底 + 高光描边</p></div>
-      <div class="fg-card fg-card--flat pad"><div style="font-weight:600">轻量卡</div><p class="note">fg-card--flat · 无 backdrop，密集列表护性能</p></div>
-      <div class="fg-card fg-card--accent pad"><div style="font-weight:600">强调卡</div><p class="note">fg-card--accent · 左上渗入一缕蓝</p></div>
-    </div>
-  </section>
+      <!-- ============ 概览 ============ -->
+      <div data-pane="overview">
 
-  <!-- 控制卡 + 开关 + 步进器 -->
-  <section>
-    <div class="fg-section-title">开关与步进器</div>
-    <div class="fg-card fg-card--accent ctrl">
-      <div class="info"><div class="t">总开关</div><div class="d">玻璃轨道 + 高光滑块 + 开启态蓝辉光</div></div>
-      <label class="fg-switch"><input type="checkbox" checked /><span class="fg-slider"></span></label>
-    </div>
-    <div class="fg-card ctrl">
-      <div class="info"><div class="t">保留上限</div><div class="d">fg-num + fg-btn 组成步进器</div></div>
-      <div class="stepper">
-        <button class="fg-btn">−</button>
-        <input class="fg-num" type="number" value="500" />
-        <span style="color:var(--fg-muted);font-size:0.8rem">条</span>
-        <button class="fg-btn">+</button>
+        <div class="demo-hero lg-enter">
+          <div class="sub">一份令牌 · 一份组件 · 一份折射引擎。引 tokens.css + glass.css 即得完整主题，折射可选。</div>
+          <div class="ver">VISUAL IDENTITY SYSTEM</div>
+        </div>
+
+        <!-- 色板 -->
+        <section class="demo-section">
+          <div class="fg-section-title">色彩令牌</div>
+          <div class="swatches">
+            <div class="swatch" style="background:var(--bg-0)">bg-0</div>
+            <div class="swatch" style="background:var(--bg-1)">bg-1</div>
+            <div class="swatch" style="background:var(--bg-2)">bg-2</div>
+            <div class="swatch" style="background:var(--accent)">accent</div>
+            <div class="swatch" style="background:var(--accent-bright);color:#06101f">accent-bright</div>
+            <div class="swatch" style="background:var(--accent-soft)">accent-soft</div>
+            <div class="swatch" style="background:rgba(var(--glow-b),.6)">glow-b 青</div>
+            <div class="swatch" style="background:var(--ok-soft);color:var(--ok)">ok</div>
+            <div class="swatch" style="background:var(--danger-soft);color:var(--danger)">danger</div>
+            <div class="swatch" style="background:var(--violet-soft);color:var(--violet)">violet</div>
+          </div>
+        </section>
+
+        <!-- 按钮 -->
+        <section class="demo-section">
+          <div class="fg-section-title">按钮 · fg-btn</div>
+          <div class="row">
+            <button class="fg-btn">默认</button>
+            <button class="fg-btn fg-btn--primary">主操作</button>
+            <button class="fg-btn fg-btn--danger">危险</button>
+            <button class="fg-btn fg-btn--ghost">幽灵</button>
+            <button class="fg-btn fg-btn--tiny">微型</button>
+            <button class="fg-btn" disabled>禁用</button>
+          </div>
+        </section>
+
+        <!-- 药丸 + 标签 -->
+        <section class="demo-section">
+          <div class="fg-section-title">药丸 · fg-chip ／ 标签 · fg-tag</div>
+          <div class="row" style="margin-bottom:12px">
+            <span class="fg-chip">复制</span>
+            <span class="fg-chip">在浏览器打开</span>
+            <span class="fg-chip is-active">✓ 已选中</span>
+            <span class="fg-chip" data-glass="chip">折射药丸</span>
+          </div>
+          <div class="row">
+            <span class="fg-tag">默认</span>
+            <span class="fg-tag fg-tag--accent">智能接口</span>
+            <span class="fg-tag fg-tag--ok">已安装</span>
+            <span class="fg-tag fg-tag--warn">待确认</span>
+            <span class="fg-tag fg-tag--danger">未安装</span>
+            <span class="fg-tag fg-tag--violet">插件</span>
+          </div>
+        </section>
+
+        <!-- 卡片 -->
+        <section class="demo-section">
+          <div class="fg-section-title">玻璃卡片 · fg-card</div>
+          <div class="grid-cards lg-stagger">
+            <div class="fg-card pad"><div style="font-weight:600">标准卡</div><p class="note">fg-card · 磨砂底 + 高光描边</p></div>
+            <div class="fg-card fg-card--flat pad"><div style="font-weight:600">轻量卡</div><p class="note">fg-card--flat · 无 backdrop，密集列表护性能</p></div>
+            <div class="fg-card fg-card--accent pad"><div style="font-weight:600">强调卡</div><p class="note">fg-card--accent · 左上渗入一缕蓝</p></div>
+          </div>
+        </section>
+
+        <!-- 贴边长条 -->
+        <section class="demo-section">
+          <div class="fg-section-title">贴边长条 · fg-bar</div>
+          <div class="fg-bar" style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:var(--radius)">
+            <span class="fg-slogan" style="font-size:1.1rem">FairyGlass</span>
+            <span class="note" style="flex:1">顶/底/侧栏【贴视口边缘】时专用：强磨砂玻璃，<strong style="color:var(--fg-muted)">不上折射</strong>（折射层的 fixed 光斑在视口外是纯深色，贴边会采到 → 黑边）。注意区分：本页侧栏/顶栏是【留边浮块】不贴边，所以用圆角玻璃浮块；真贴边的长条才用 fg-bar。</span>
+            <button class="fg-btn fg-btn--ghost fg-btn--tiny">设置</button>
+          </div>
+        </section>
+
       </div>
-    </div>
-    <div class="fg-card ctrl">
-      <div class="info"><div class="t">搜索框</div><div class="d">fg-input · 聚焦泛蓝</div></div>
-      <input class="fg-input" placeholder="查找…" style="width:240px" />
-    </div>
-  </section>
 
-  <!-- 徽章 -->
-  <section>
-    <div class="fg-section-title">徽章</div>
-    <div class="row">
-      <span class="fg-badge">v0.1</span>
-      <span class="fg-badge--privacy">本地处理 · 零上传</span>
-    </div>
-  </section>
+      <!-- ============ 表单控件 ============ -->
+      <div data-pane="forms" hidden>
 
-  <!-- 弹窗 / toast 触发 -->
-  <section>
-    <div class="fg-section-title">弹窗与浮层</div>
-    <div class="row">
-      <button class="fg-btn fg-btn--primary" onclick="document.getElementById('demoModal').style.display='flex'">打开弹窗</button>
-      <button class="fg-btn" onclick="showToast('已保存到本机')">触发 toast</button>
-    </div>
-  </section>
+        <!-- 开关 / 步进器 / 搜索 -->
+        <section class="demo-section">
+          <div class="fg-section-title">开关 · 步进器 · 搜索框</div>
+          <div class="fg-card fg-card--accent ctrl">
+            <div class="info"><div class="t">总开关</div><div class="d">玻璃轨道 + 高光滑块 + 开启态蓝辉光</div></div>
+            <label class="fg-switch"><input type="checkbox" checked /><span class="fg-slider"></span></label>
+          </div>
+          <div class="fg-card ctrl">
+            <div class="info"><div class="t">保留上限</div><div class="d">fg-stepper · 加减按钮 + 可编辑数值</div></div>
+            <div class="fg-stepper">
+              <button class="fg-btn">−</button>
+              <input class="fg-num" type="number" value="500" />
+              <span style="color:var(--fg-muted);font-size:0.8rem">条</span>
+              <button class="fg-btn">+</button>
+            </div>
+          </div>
+          <div class="fg-card ctrl">
+            <div class="info"><div class="t">弹性搜索框</div><div class="d">fg-search · 聚焦时宽度过冲一下回落（受控回弹例外）</div></div>
+            <input class="fg-search" placeholder="点这里聚焦试试…" />
+          </div>
+        </section>
 
-  <p class="note" style="margin-top:48px;text-align:center">
-    一份令牌、一份组件、一份折射引擎。接入只需引 tokens.css + glass.css，折射可选。详见 README.md 与 AGENTS.md。
-  </p>
+        <!-- 复选 / 单选 -->
+        <section class="demo-section">
+          <div class="fg-section-title">复选框 · 单选框</div>
+          <div class="fg-card pad">
+            <div class="row" style="gap:22px;margin-bottom:14px">
+              <label class="fg-check"><input type="checkbox" checked /><span class="fg-check__box"></span>开机自启动</label>
+              <label class="fg-check"><input type="checkbox" /><span class="fg-check__box"></span>最小化到托盘</label>
+            </div>
+            <div class="row" style="gap:22px">
+              <label class="fg-radio"><input type="radio" name="mode" checked /><span class="fg-radio__box"></span>推荐最优方案</label>
+              <label class="fg-radio"><input type="radio" name="mode" /><span class="fg-radio__box"></span>强制自定义快捷键</label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 输入 / 文本域 / 下拉 / 分段 -->
+        <section class="demo-section">
+          <div class="fg-section-title">输入 · 文本域 · 下拉 · 分段</div>
+          <div class="fg-card pad col">
+            <div class="row">
+              <input class="fg-input" placeholder="单行输入 fg-input" />
+              <div class="fg-select" id="demoSelect">
+                <span>每次保存都备份</span>
+                <span class="fg-select__caret">▼</span>
+              </div>
+              <div class="fg-segmented">
+                <button class="fg-segmented__item is-active">列表</button>
+                <button class="fg-segmented__item">网格</button>
+                <button class="fg-segmented__item">时间轴</button>
+              </div>
+            </div>
+            <textarea class="fg-textarea" placeholder="多行文本域 fg-textarea…"></textarea>
+            <!-- 下拉菜单浮层示例（静态展开，仅看样式） -->
+            <div class="fg-menu" style="align-self:flex-start">
+              <div class="fg-menu-item is-active">✓ 智能接口保存</div>
+              <div class="fg-menu-item">快捷键保存</div>
+              <div class="fg-menu__sep"></div>
+              <div class="fg-menu-item">暂停此软件</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 标签页 -->
+        <section class="demo-section">
+          <div class="fg-section-title">标签页 · fg-tabs</div>
+          <div class="fg-card pad">
+            <div class="fg-tabs" id="demoTabs">
+              <button class="fg-tab is-active">常规</button>
+              <button class="fg-tab">备份策略</button>
+              <button class="fg-tab">快捷键</button>
+              <button class="fg-tab">关于</button>
+            </div>
+            <p class="note" style="margin-top:14px">激活项一道蓝下划线 scaleX 滑入，无回弹。点上面试试。</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============ 反馈与状态 ============ -->
+      <div data-pane="feedback" hidden>
+
+        <!-- 提示横幅 -->
+        <section class="demo-section">
+          <div class="fg-section-title">提示横幅 · fg-alert</div>
+          <div class="col">
+            <div class="fg-alert fg-alert--info"><span class="fg-alert__icon">i</span><div>信息：快照只保存在本机磁盘，绝不会上传。</div></div>
+            <div class="fg-alert fg-alert--ok"><span class="fg-alert__icon">✓</span><div>已保存到本机，共 500 条历史版本可回溯。</div></div>
+            <div class="fg-alert fg-alert--warn"><span class="fg-alert__icon">!</span><div>检测到该软件未安装，装上后重启本程序即可出现开关。</div></div>
+            <div class="fg-alert fg-alert--danger"><span class="fg-alert__icon">×</span><div>保存失败：目标目录无写入权限。</div></div>
+          </div>
+        </section>
+
+        <!-- 进度 / 加载 / 骨架 -->
+        <section class="demo-section">
+          <div class="fg-section-title">进度 · 加载 · 骨架屏</div>
+          <div class="fg-card pad col" style="gap:18px">
+            <div>
+              <div class="note" style="margin-bottom:6px">确定进度 68%</div>
+              <div class="fg-progress"><div class="fg-progress__bar" style="width:68%"></div></div>
+            </div>
+            <div>
+              <div class="note" style="margin-bottom:6px">不确定进度</div>
+              <div class="fg-progress fg-progress--indeterminate"><div class="fg-progress__bar"></div></div>
+            </div>
+            <div class="row" style="gap:16px;align-items:center">
+              <span class="fg-spinner"></span>
+              <span class="note">fg-spinner 加载转圈</span>
+            </div>
+            <div class="col" style="gap:8px">
+              <div class="fg-skeleton" style="height:14px;width:60%"></div>
+              <div class="fg-skeleton" style="height:14px;width:90%"></div>
+              <div class="fg-skeleton" style="height:14px;width:75%"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 徽章 / tooltip / 键帽 / 头像 -->
+        <section class="demo-section">
+          <div class="fg-section-title">徽章 · 提示气泡 · 键帽 · 头像</div>
+          <div class="fg-card pad row" style="gap:18px">
+            <span class="fg-badge">v0.2</span>
+            <span class="fg-badge--privacy fg-badge">本地处理 · 零上传</span>
+            <span class="fg-tooltip" data-tip="悬停显示的提示气泡"><button class="fg-btn fg-btn--tiny">悬停看 tooltip</button></span>
+            <span class="note">保存：<kbd class="fg-kbd">Ctrl</kbd> + <kbd class="fg-kbd">S</kbd></span>
+            <span class="fg-avatar">恒</span>
+          </div>
+        </section>
+
+        <!-- 弹窗 / toast 触发 -->
+        <section class="demo-section">
+          <div class="fg-section-title">弹窗与浮层</div>
+          <div class="fg-card pad row">
+            <button class="fg-btn fg-btn--primary" onclick="document.getElementById('demoModal').style.display='flex'">打开弹窗</button>
+            <button class="fg-btn" onclick="showToast('已保存到本机')">触发 toast</button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============ 数据展示 ============ -->
+      <div data-pane="data" hidden>
+
+        <!-- 面包屑 -->
+        <section class="demo-section">
+          <div class="fg-section-title">面包屑 · fg-breadcrumb</div>
+          <nav class="fg-breadcrumb">
+            <a href="#">软件目录</a>
+            <span class="fg-breadcrumb__sep">/</span>
+            <a href="#">办公文档</a>
+            <span class="fg-breadcrumb__sep">/</span>
+            <span style="color:var(--fg)">Microsoft Word</span>
+          </nav>
+        </section>
+
+        <!-- 折叠手风琴（分类抽屉，对齐快存软件目录） -->
+        <section class="demo-section">
+          <div class="fg-section-title">折叠手风琴 · fg-accordion（快存软件目录同款）</div>
+          <div id="demoAccordion">
+            <div class="fg-accordion is-open">
+              <button class="fg-accordion__head">
+                <span class="fg-accordion__chevron">▸</span>
+                <span class="fg-accordion__name">办公文档</span>
+                <span class="fg-accordion__count">3</span>
+              </button>
+              <div class="fg-accordion__body">
+                <div class="fg-accordion__inner">
+                  <ul class="fg-list">
+                    <li class="fg-list-item"><div class="fg-list-item__main">Microsoft Word<div class="fg-list-item__sub">智能接口</div></div><span class="fg-tag fg-tag--accent">智能接口</span><label class="fg-switch"><input type="checkbox" checked><span class="fg-slider"></span></label></li>
+                    <li class="fg-list-item"><div class="fg-list-item__main">Microsoft Excel<div class="fg-list-item__sub">智能接口</div></div><span class="fg-tag fg-tag--accent">智能接口</span><label class="fg-switch"><input type="checkbox" checked><span class="fg-slider"></span></label></li>
+                    <li class="fg-list-item"><div class="fg-list-item__main">记事本<div class="fg-list-item__sub">快捷键 Ctrl+S</div></div><span class="fg-tag">快捷键</span><label class="fg-switch"><input type="checkbox"><span class="fg-slider"></span></label></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="fg-accordion">
+              <button class="fg-accordion__head">
+                <span class="fg-accordion__chevron">▸</span>
+                <span class="fg-accordion__name">影视后期</span>
+                <span class="fg-accordion__count">2</span>
+              </button>
+              <div class="fg-accordion__body">
+                <div class="fg-accordion__inner">
+                  <ul class="fg-list">
+                    <li class="fg-list-item"><div class="fg-list-item__main">Premiere Pro</div><span class="fg-tag fg-tag--violet">插件</span><label class="fg-switch"><input type="checkbox"><span class="fg-slider"></span></label></li>
+                    <li class="fg-list-item"><div class="fg-list-item__main">After Effects</div><span class="fg-tag fg-tag--danger">未安装</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="note" style="margin-top:8px">点头部展开/收起，grid 0fr→1fr 高度过渡，雪佛龙 ▸ 转 90°。</p>
+        </section>
+
+        <!-- 抽屉（单块折叠，无头部样式；与手风琴的区别：手风琴是成组分类头，抽屉是任意一块内容的收展） -->
+        <section class="demo-section">
+          <div class="fg-section-title">抽屉 · fg-drawer（单块折叠）</div>
+          <div class="fg-card pad">
+            <div class="row" style="margin-bottom:12px">
+              <button class="fg-btn fg-btn--primary" onclick="
+                const d=document.getElementById('demoDrawer');
+                d.classList.toggle('is-open');
+                this.textContent=d.classList.contains('is-open')?'收起抽屉':'展开抽屉';
+              ">展开抽屉</button>
+              <span class="note">grid-template-rows 0fr→1fr 过渡，自然高度滑展，无 max-height 假上限</span>
+            </div>
+            <div class="fg-drawer" id="demoDrawer">
+              <div class="fg-drawer__inner">
+                <div class="fg-card pad" style="background:var(--glass-fill);margin-top:4px">
+                  <p class="note" style="line-height:1.7">
+                    内层 overflow:hidden + min-height:0，让网格行真正能压到 0。内容多高都自适应，过渡丝滑无截断。<br>
+                    手风琴 fg-accordion 自带分类头 + 雪佛龙 + 数量角标，用于成组分类；抽屉 fg-drawer 是裸折叠区，配任意触发器收展单块内容。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 数据表格 -->
+        <section class="demo-section">
+          <div class="fg-section-title">数据表格 · fg-table</div>
+          <div class="fg-card pad" style="overflow-x:auto">
+            <table class="fg-table fg-table--numeric">
+              <thead><tr><th>软件</th><th>状态</th><th>保存模式</th><th>历史版本</th></tr></thead>
+              <tbody>
+                <tr><td>Microsoft Word</td><td><span class="fg-tag fg-tag--ok">守护中</span></td><td>智能接口</td><td>128</td></tr>
+                <tr><td>Photoshop</td><td><span class="fg-tag fg-tag--ok">守护中</span></td><td>快捷键</td><td>64</td></tr>
+                <tr><td>After Effects</td><td><span class="fg-tag fg-tag--danger">未安装</span></td><td>—</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 分页 + 空状态 -->
+        <section class="demo-section">
+          <div class="fg-section-title">分页 · 空状态</div>
+          <div class="fg-card pad col" style="gap:20px">
+            <div class="fg-pagination">
+              <span class="fg-pagination__item">←</span>
+              <span class="fg-pagination__item is-active">1</span>
+              <span class="fg-pagination__item">2</span>
+              <span class="fg-pagination__item">3</span>
+              <span class="fg-pagination__item">→</span>
+            </div>
+            <hr class="fg-divider" style="margin:0" />
+            <div class="fg-empty">
+              <div class="fg-empty__icon">○</div>
+              <div class="fg-empty__title">还没有历史版本</div>
+              <div class="note">开启「保留快照」后，每次保存都会在这里留一份。</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============ 折射透镜 ============ -->
+      <div data-pane="refraction" hidden>
+
+        <section class="demo-section">
+          <div class="fg-section-title">折射透镜（浮空元素专用）</div>
+          <div class="row" style="justify-content:center; padding:20px 0;">
+            <button class="fg-cta" data-glass="button">
+              <span class="fg-cta__main">液态玻璃透镜</span>
+              <span style="color:var(--fg-muted);font-size:0.85rem;">data-glass="button" · 边缘真实折射 + 色散</span>
+            </button>
+          </div>
+          <p class="note">上方按钮经 <code>liquidGlass.js</code> 注入折射层：边缘把背后光斑真实弯曲，并带极淡彩虹镶边。只给浮空、数量少的元素用。</p>
+
+          <!-- preset 参数表 -->
+          <div class="fg-card pad" style="margin-top:14px;overflow-x:auto">
+            <table class="preset-table">
+              <thead>
+                <tr><th>data-glass</th><th>用途</th><th>bezel<br><span>斜面带宽</span></th><th>scale<br><span>折射强度</span></th><th>blur</th><th>dispersion<br><span>色散</span></th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>button</code></td><td>主按钮 / CTA，最强</td><td>22</td><td>72</td><td>1.5</td><td>3</td></tr>
+                <tr><td><code>card</code><span class="def">默认</span></td><td>浮空卡 / 弹窗，中等</td><td>18</td><td>60</td><td>1.5</td><td>2.4</td></tr>
+                <tr><td><code>chip</code></td><td>小药丸 / 胶囊，轻</td><td>12</td><td>44</td><td>1</td><td>1.6</td></tr>
+                <tr><td><code>bar</code></td><td>贴边长条 → 跳过折射</td><td colspan="4" style="color:var(--fg-dim)">不注入折射层，保留磨砂（防黑边）</td></tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:10px">bezel = 边缘斜面带像素宽（越大折射区越宽）；scale = 位移像素（越大弯曲越猛）；dispersion = 边缘彩虹镶边强度，0 关闭。挑不准就用 <code>card</code> 默认档；要更猛单独传 opts 覆写，如 <code>hydrateGlass(el,{scale:90})</code>。</p>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- 弹窗 -->
@@ -158,8 +457,40 @@
 
 <script src="js/liquidGlass.js"></script>
 <script>
-  // 给所有 data-glass 元素注入折射（bar/滚动容器会被引擎自动跳过）
+  // 给所有 data-glass 元素注入折射（bar/滚动容器会被引擎自动跳过）。
+  // 注意：折射只在元素可见时尺寸才正确，故切到「折射透镜」面板时再 hydrate 一次。
   FairyGlass.hydrateGlass(document);
+
+  // —— 侧栏导航：切换主区面板 ——
+  const titles = { overview:"概览", forms:"表单控件", feedback:"反馈与状态", data:"数据展示", refraction:"折射透镜" };
+  document.getElementById("demoNav").addEventListener("click", (e) => {
+    const item = e.target.closest(".fg-nav-item");
+    if (!item) return;
+    const view = item.dataset.view;
+    document.querySelectorAll("#demoNav .fg-nav-item").forEach(n => n.classList.toggle("is-active", n === item));
+    document.querySelectorAll("[data-pane]").forEach(p => p.hidden = p.dataset.pane !== view);
+    document.getElementById("demoTitle").textContent = titles[view];
+    // 折射面板首次显示时，元素这才有真实尺寸，补一次 hydrate
+    if (view === "refraction") FairyGlass.hydrateGlass(document);
+  });
+
+  // —— 手风琴：点头部切 is-open ——
+  document.getElementById("demoAccordion").addEventListener("click", (e) => {
+    const head = e.target.closest(".fg-accordion__head");
+    if (head) head.closest(".fg-accordion").classList.toggle("is-open");
+  });
+
+  // —— 标签页：点切 is-active ——
+  document.getElementById("demoTabs").addEventListener("click", (e) => {
+    const tab = e.target.closest(".fg-tab");
+    if (!tab) return;
+    document.querySelectorAll("#demoTabs .fg-tab").forEach(t => t.classList.toggle("is-active", t === tab));
+  });
+
+  // —— 下拉触发器：点切 is-open（仅演示样式态） ——
+  document.getElementById("demoSelect").addEventListener("click", function () {
+    this.classList.toggle("is-open");
+  });
 
   function showToast(msg) {
     const t = document.createElement("div");

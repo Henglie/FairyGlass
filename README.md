@@ -17,9 +17,9 @@ FairyGlass 是从「剪贴板里有什么？」与「优雅快存 FairySave」�
 ```
 FairyGlass/
   css/tokens.css      令牌层：颜色 / 字体 / 玻璃材质 / 动效 / 背景 / 滚动条 / 入场动画
-  css/glass.css       组件层：卡 / 按钮 / 药丸 / 开关 / 输入 / 导航 / 弹窗 / toast / 徽章
+  css/glass.css       组件层：完整 VIS（外壳 / 导航 / 折叠 / 表单 / 反馈 / 数据展示 / 折射层样式）
   js/liquidGlass.js   折射引擎（可选，UMD，挂 window.FairyGlass）
-  demo.html           全组件预览 + 折射实例
+  demo.html           全组件预览 + 折射实例（侧栏分面板展示）
   README.md           本文件
   AGENTS.md           给接手 AI 的硬性规范
 ```
@@ -87,4 +87,4 @@ hydrateGlass(document);
 - 剪贴板项目（WhatsInYourClipboard）：液态玻璃主题的原始打磨地（折射引擎、动效令牌、跨浏览器统一均在此定型）。
 - 优雅快存（FairySave）：仪表盘形态的实战检验（侧边栏 + 密集软件卡 + 开关）。
 
-版本 v0.1。
+版本 v0.2。组件库已补齐为完整 VIS（应用外壳、导航、折叠、表单、反馈、数据展示一整套），可独立支撑一个完整界面。
